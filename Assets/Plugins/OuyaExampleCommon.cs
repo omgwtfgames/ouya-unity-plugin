@@ -24,6 +24,11 @@ public class OuyaExampleCommon
     /// </summary>
     public static OuyaSDK.OuyaPlayer Player = OuyaSDK.OuyaPlayer.player1;
 
+	/// <summary>
+	/// Points to either GetButton, GetButtonUp of GetButtonDown methods
+	/// </summary>
+	delegate bool GetButtonHandler(int buttonNum, OuyaSDK.OuyaPlayer player);
+	
     #region Mapping Helpers
 
     public static float GetAxis(string ouyaMapping, OuyaSDK.OuyaPlayer player)
@@ -561,7 +566,29 @@ public class OuyaExampleCommon
         OuyaKeyCode key = (OuyaKeyCode)Enum.Parse(typeof(OuyaKeyCode), keyCode);
         return Input.GetKey((KeyCode)(int)key);
     }
-
+	
+	public static bool GetButtonDown(int buttonNum, OuyaSDK.OuyaPlayer player)
+    {
+        string keyCode = GetKeyCode(buttonNum, player);
+        if (string.IsNullOrEmpty(keyCode))
+        {
+            return false;
+        }
+        OuyaKeyCode key = (OuyaKeyCode)Enum.Parse(typeof(OuyaKeyCode), keyCode);
+        return Input.GetKeyDown((KeyCode)(int)key);
+    }
+	
+	public static bool GetButtonUp(int buttonNum, OuyaSDK.OuyaPlayer player)
+    {
+        string keyCode = GetKeyCode(buttonNum, player);
+        if (string.IsNullOrEmpty(keyCode))
+        {
+            return false;
+        }
+        OuyaKeyCode key = (OuyaKeyCode)Enum.Parse(typeof(OuyaKeyCode), keyCode);
+        return Input.GetKeyUp((KeyCode)(int)key);
+    }
+	
     public static bool GetButton(OuyaSDK.KeyEnum keyCode)
     {
         return (
@@ -574,8 +601,46 @@ public class OuyaExampleCommon
                    GetButton(keyCode, OuyaSDK.OuyaPlayer.player7) ||
                    GetButton(keyCode, OuyaSDK.OuyaPlayer.player8));
     }
-
-    public static bool GetButton(OuyaSDK.KeyEnum keyCode, OuyaSDK.OuyaPlayer player)
+	
+	public static bool GetButtonUp(OuyaSDK.KeyEnum keyCode)
+    {
+        return (
+                   GetButtonUp(keyCode, OuyaSDK.OuyaPlayer.player1) ||
+                   GetButtonUp(keyCode, OuyaSDK.OuyaPlayer.player2) ||
+                   GetButtonUp(keyCode, OuyaSDK.OuyaPlayer.player3) ||
+                   GetButtonUp(keyCode, OuyaSDK.OuyaPlayer.player4) ||
+                   GetButtonUp(keyCode, OuyaSDK.OuyaPlayer.player5) ||
+                   GetButtonUp(keyCode, OuyaSDK.OuyaPlayer.player6) ||
+                   GetButtonUp(keyCode, OuyaSDK.OuyaPlayer.player7) ||
+                   GetButtonUp(keyCode, OuyaSDK.OuyaPlayer.player8));
+    }
+	
+	public static bool GetButtonDown(OuyaSDK.KeyEnum keyCode) {
+        return (
+                   GetButtonDown(keyCode, OuyaSDK.OuyaPlayer.player1) ||
+                   GetButtonDown(keyCode, OuyaSDK.OuyaPlayer.player2) ||
+                   GetButtonDown(keyCode, OuyaSDK.OuyaPlayer.player3) ||
+                   GetButtonDown(keyCode, OuyaSDK.OuyaPlayer.player4) ||
+                   GetButtonDown(keyCode, OuyaSDK.OuyaPlayer.player5) ||
+                   GetButtonDown(keyCode, OuyaSDK.OuyaPlayer.player6) ||
+                   GetButtonDown(keyCode, OuyaSDK.OuyaPlayer.player7) ||
+                   GetButtonDown(keyCode, OuyaSDK.OuyaPlayer.player8));
+    }
+	
+	public static bool GetButton(OuyaSDK.KeyEnum keyCode, OuyaSDK.OuyaPlayer player) {
+		GetButtonHandler method = GetButton;
+		return GetButton(keyCode, player, method);
+	}
+    public static bool GetButtonUp(OuyaSDK.KeyEnum keyCode, OuyaSDK.OuyaPlayer player) {
+		GetButtonHandler method = GetButtonUp;
+		return GetButton(keyCode, player, method);
+	}
+	public static bool GetButtonDown(OuyaSDK.KeyEnum keyCode, OuyaSDK.OuyaPlayer player) {
+		GetButtonHandler method = GetButtonDown;
+		return GetButton(keyCode, player, method);
+	}
+	
+    static bool GetButton(OuyaSDK.KeyEnum keyCode, OuyaSDK.OuyaPlayer player, GetButtonHandler getButton)
     {
         if (null == OuyaSDK.Joysticks)
         {
@@ -601,31 +666,31 @@ public class OuyaExampleCommon
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_DRUMKIT_GREEN:
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_DRUMKIT_A:
                     case OuyaSDK.KeyEnum.BUTTON_O:
-                        return GetButton(0, player);
+                        return getButton(0, player);
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_DRUMKIT_RED:
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_DRUMKIT_B:
                     case OuyaSDK.KeyEnum.BUTTON_A:
-                        return GetButton(1, player);
+                        return getButton(1, player);
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_DRUMKIT_YELLOW:
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_DRUMKIT_Y:
                     case OuyaSDK.KeyEnum.BUTTON_Y:
-                        return GetButton(4, player);
+                        return getButton(4, player);
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_DRUMKIT_BLUE:
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_DRUMKIT_X:
                     case OuyaSDK.KeyEnum.BUTTON_U:
-                        return GetButton(3, player);
+                        return getButton(3, player);
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_DRUMKIT_ORANGE:
                     case OuyaSDK.KeyEnum.BUTTON_L3:
-                        return GetButton(6, player);
+                        return getButton(6, player);
                     case OuyaSDK.KeyEnum.BUTTON_BACK:
                     case OuyaSDK.KeyEnum.BUTTON_R3:
-                        return GetButton(10, player);
+                        return getButton(10, player);
                     case OuyaSDK.KeyEnum.BUTTON_START:
                     case OuyaSDK.KeyEnum.BUTTON_LB:
-                        return GetButton(11, player);
+                        return getButton(11, player);
                     case OuyaSDK.KeyEnum.BUTTON_SYSTEM:
                     case OuyaSDK.KeyEnum.BUTTON_RB:
-                        return GetButton(12, player);
+                        return getButton(12, player);
                     default:
                         return false;
                 }
@@ -634,30 +699,30 @@ public class OuyaExampleCommon
                 {
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_GUITAR_GREEN:
                     case OuyaSDK.KeyEnum.BUTTON_O:
-                        return GetButton(0, player);
+                        return getButton(0, player);
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_GUITAR_RED:
                     case OuyaSDK.KeyEnum.BUTTON_A:
-                        return GetButton(1, player);
+                        return getButton(1, player);
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_GUITAR_YELLOW:
                     case OuyaSDK.KeyEnum.BUTTON_Y:
-                        return GetButton(4, player);
+                        return getButton(4, player);
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_GUITAR_BLUE:
                     case OuyaSDK.KeyEnum.BUTTON_U:
-                        return GetButton(3, player);
+                        return getButton(3, player);
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_GUITAR_ORANGE:
                     case OuyaSDK.KeyEnum.BUTTON_L3:
-                        return GetButton(6, player);
+                        return getButton(6, player);
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_GUITAR_LOWER:
-                        return GetButton(13, player);
+                        return getButton(13, player);
                     case OuyaSDK.KeyEnum.BUTTON_BACK:
                     case OuyaSDK.KeyEnum.BUTTON_R3:
-                        return GetButton(10, player);
+                        return getButton(10, player);
                     case OuyaSDK.KeyEnum.BUTTON_START:
                     case OuyaSDK.KeyEnum.BUTTON_LB:
-                        return GetButton(11, player);
+                        return getButton(11, player);
                     case OuyaSDK.KeyEnum.BUTTON_SYSTEM:
                     case OuyaSDK.KeyEnum.BUTTON_RB:
-                        return GetButton(12, player);
+                        return getButton(12, player);
                     case OuyaSDK.KeyEnum.HARMONIX_ROCK_BAND_GUITAR_PICKUP:
                     case OuyaSDK.KeyEnum.BUTTON_LT:
                         return false;
@@ -681,21 +746,21 @@ public class OuyaExampleCommon
                 switch (keyCode)
                 {
                     case OuyaSDK.KeyEnum.BUTTON_LB:
-                        return GetButton(6, player);
+                        return getButton(6, player);
                     case OuyaSDK.KeyEnum.BUTTON_RB:
-                        return GetButton(7, player);
+                        return getButton(7, player);
                     case OuyaSDK.KeyEnum.BUTTON_O:
-                        return GetButton(0, player);
+                        return getButton(0, player);
                     case OuyaSDK.KeyEnum.BUTTON_U:
-                        return GetButton(3, player);
+                        return getButton(3, player);
                     case OuyaSDK.KeyEnum.BUTTON_Y:
-                        return GetButton(4, player);
+                        return getButton(4, player);
                     case OuyaSDK.KeyEnum.BUTTON_A:
-                        return GetButton(1, player);
+                        return getButton(1, player);
                     case OuyaSDK.KeyEnum.BUTTON_L3:
-                        return GetButton(13, player);
+                        return getButton(13, player);
                     case OuyaSDK.KeyEnum.BUTTON_R3:
-                        return GetButton(14, player);
+                        return getButton(14, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_UP:
                         return GetAxis(keyCode, player) > 0f;
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_DOWN:
@@ -717,33 +782,33 @@ public class OuyaExampleCommon
                 switch (keyCode)
                 {
                     case OuyaSDK.KeyEnum.BUTTON_LB:
-                        return GetButton(4, player);
+                        return getButton(4, player);
                     case OuyaSDK.KeyEnum.BUTTON_RB:
-                        return GetButton(5, player);
+                        return getButton(5, player);
                     case OuyaSDK.KeyEnum.BUTTON_O:
-                        return GetButton(0, player);
+                        return getButton(0, player);
                     case OuyaSDK.KeyEnum.BUTTON_U:
-                        return GetButton(1, player);
+                        return getButton(1, player);
                     case OuyaSDK.KeyEnum.BUTTON_Y:
-                        return GetButton(2, player);
+                        return getButton(2, player);
                     case OuyaSDK.KeyEnum.BUTTON_A:
-                        return GetButton(3, player);
+                        return getButton(3, player);
                     case OuyaSDK.KeyEnum.BUTTON_L3:
-                        return GetButton(6, player);
+                        return getButton(6, player);
                     case OuyaSDK.KeyEnum.BUTTON_R3:
-                        return GetButton(7, player);
+                        return getButton(7, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_UP:
-                        return GetButton(8, player);
+                        return getButton(8, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_DOWN:
-                        return GetButton(9, player);
+                        return getButton(9, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_LEFT:
-                        return GetButton(10, player);
+                        return getButton(10, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_RIGHT:
-                        return GetButton(11, player);
+                        return getButton(11, player);
                     case OuyaSDK.KeyEnum.BUTTON_LT:
-                        return GetButton(12, player);
+                        return getButton(12, player);
                     case OuyaSDK.KeyEnum.BUTTON_RT:
-                        return GetButton(13, player);
+                        return getButton(13, player);
                     default:
                         return false;
                 }
@@ -755,29 +820,29 @@ public class OuyaExampleCommon
                 switch (keyCode)
                 {
                     case OuyaSDK.KeyEnum.BUTTON_LB:
-                        return GetButton(6, player);
+                        return getButton(6, player);
                     case OuyaSDK.KeyEnum.BUTTON_RB:
-                        return GetButton(7, player);
+                        return getButton(7, player);
                     case OuyaSDK.KeyEnum.BUTTON_O:
-                        return GetButton(0, player);
+                        return getButton(0, player);
                     case OuyaSDK.KeyEnum.BUTTON_U:
-                        return GetButton(3, player);
+                        return getButton(3, player);
                     case OuyaSDK.KeyEnum.BUTTON_Y:
-                        return GetButton(4, player);
+                        return getButton(4, player);
                     case OuyaSDK.KeyEnum.BUTTON_A:
-                        return GetButton(1, player);
+                        return getButton(1, player);
                     case OuyaSDK.KeyEnum.BUTTON_L3:
-                        return GetButton(13, player);
+                        return getButton(13, player);
                     case OuyaSDK.KeyEnum.BUTTON_R3:
-                        return GetButton(14, player);
+                        return getButton(14, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_UP:
-                        return GetButton(2, player);
+                        return getButton(2, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_DOWN:
-                        return GetButton(3, player);
+                        return getButton(3, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_LEFT:
-                        return GetButton(0, player);
+                        return getButton(0, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_RIGHT:
-                        return GetButton(1, player);
+                        return getButton(1, player);
                     case OuyaSDK.KeyEnum.BUTTON_LT:
                         return GetAxis(keyCode, player) > 0f;
                     case OuyaSDK.KeyEnum.BUTTON_RT:
@@ -791,29 +856,29 @@ public class OuyaExampleCommon
                     switch (keyCode)
                     {
                         case OuyaSDK.KeyEnum.BUTTON_LB:
-                            return GetButton(13, player);
+                            return getButton(13, player);
                         case OuyaSDK.KeyEnum.BUTTON_RB:
-                            return GetButton(14, player);
+                            return getButton(14, player);
                         case OuyaSDK.KeyEnum.BUTTON_O:
-                            return GetButton(16, player);
+                            return getButton(16, player);
                         case OuyaSDK.KeyEnum.BUTTON_U:
-                            return GetButton(18, player);
+                            return getButton(18, player);
                         case OuyaSDK.KeyEnum.BUTTON_Y:
-                            return GetButton(19, player);
+                            return getButton(19, player);
                         case OuyaSDK.KeyEnum.BUTTON_A:
-                            return GetButton(17, player);
+                            return getButton(17, player);
                         case OuyaSDK.KeyEnum.BUTTON_L3:
-                            return GetButton(11, player);
+                            return getButton(11, player);
                         case OuyaSDK.KeyEnum.BUTTON_R3:
-                            return GetButton(12, player);
+                            return getButton(12, player);
                         case OuyaSDK.KeyEnum.BUTTON_DPAD_UP:
-                            return GetButton(5, player);
+                            return getButton(5, player);
                         case OuyaSDK.KeyEnum.BUTTON_DPAD_DOWN:
-                            return GetButton(6, player);
+                            return getButton(6, player);
                         case OuyaSDK.KeyEnum.BUTTON_DPAD_LEFT:
-                            return GetButton(7, player);
+                            return getButton(7, player);
                         case OuyaSDK.KeyEnum.BUTTON_DPAD_RIGHT:
-                            return GetButton(8, player);
+                            return getButton(8, player);
                         case OuyaSDK.KeyEnum.BUTTON_LT:
                             return GetAxis(keyCode, player) > -1f;
                         case OuyaSDK.KeyEnum.BUTTON_RT:
@@ -827,21 +892,21 @@ public class OuyaExampleCommon
                     switch (keyCode)
                     {
                         case OuyaSDK.KeyEnum.BUTTON_LB:
-                            return GetButton(4, player);
+                            return getButton(4, player);
                         case OuyaSDK.KeyEnum.BUTTON_RB:
-                            return GetButton(5, player);
+                            return getButton(5, player);
                         case OuyaSDK.KeyEnum.BUTTON_O:
-                            return GetButton(0, player);
+                            return getButton(0, player);
                         case OuyaSDK.KeyEnum.BUTTON_U:
-                            return GetButton(2, player);
+                            return getButton(2, player);
                         case OuyaSDK.KeyEnum.BUTTON_Y:
-                            return GetButton(3, player);
+                            return getButton(3, player);
                         case OuyaSDK.KeyEnum.BUTTON_A:
-                            return GetButton(1, player);
+                            return getButton(1, player);
                         case OuyaSDK.KeyEnum.BUTTON_L3:
-                            return GetButton(8, player);
+                            return getButton(8, player);
                         case OuyaSDK.KeyEnum.BUTTON_R3:
-                            return GetButton(9, player);
+                            return getButton(9, player);
                         case OuyaSDK.KeyEnum.BUTTON_DPAD_UP:
                             return GetAxis(keyCode, player) > 0f;
                         case OuyaSDK.KeyEnum.BUTTON_DPAD_DOWN:
@@ -874,21 +939,21 @@ public class OuyaExampleCommon
                 switch (keyCode)
                 {
                     case OuyaSDK.KeyEnum.BUTTON_LB:
-                        return GetButton(6, player);
+                        return getButton(6, player);
                     case OuyaSDK.KeyEnum.BUTTON_RB:
-                        return GetButton(7, player);
+                        return getButton(7, player);
                     case OuyaSDK.KeyEnum.BUTTON_O:
-                        return GetButton(0, player);
+                        return getButton(0, player);
                     case OuyaSDK.KeyEnum.BUTTON_U:
-                        return GetButton(3, player);
+                        return getButton(3, player);
                     case OuyaSDK.KeyEnum.BUTTON_Y:
-                        return GetButton(4, player);
+                        return getButton(4, player);
                     case OuyaSDK.KeyEnum.BUTTON_A:
-                        return GetButton(1, player);
+                        return getButton(1, player);
                     case OuyaSDK.KeyEnum.BUTTON_L3:
-                        return GetButton(13, player);
+                        return getButton(13, player);
                     case OuyaSDK.KeyEnum.BUTTON_R3:
-                        return GetButton(14, player);
+                        return getButton(14, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_UP:
                         return GetAxis(keyCode, player) > 0f;
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_DOWN:
@@ -910,29 +975,29 @@ public class OuyaExampleCommon
                     switch (keyCode)
                     {
                         case OuyaSDK.KeyEnum.BUTTON_LB:
-                            return GetButton(13, player);
+                            return getButton(13, player);
                         case OuyaSDK.KeyEnum.BUTTON_RB:
-                            return GetButton(14, player);
+                            return getButton(14, player);
                         case OuyaSDK.KeyEnum.BUTTON_O:
-                            return GetButton(16, player);
+                            return getButton(16, player);
                         case OuyaSDK.KeyEnum.BUTTON_U:
-                            return GetButton(18, player);
+                            return getButton(18, player);
                         case OuyaSDK.KeyEnum.BUTTON_Y:
-                            return GetButton(19, player);
+                            return getButton(19, player);
                         case OuyaSDK.KeyEnum.BUTTON_A:
-                            return GetButton(17, player);
+                            return getButton(17, player);
                         case OuyaSDK.KeyEnum.BUTTON_L3:
-                            return GetButton(11, player);
+                            return getButton(11, player);
                         case OuyaSDK.KeyEnum.BUTTON_R3:
-                            return GetButton(12, player);
+                            return getButton(12, player);
                         case OuyaSDK.KeyEnum.BUTTON_DPAD_UP:
-                            return GetButton(5, player);
+                            return getButton(5, player);
                         case OuyaSDK.KeyEnum.BUTTON_DPAD_DOWN:
-                            return GetButton(6, player);
+                            return getButton(6, player);
                         case OuyaSDK.KeyEnum.BUTTON_DPAD_LEFT:
-                            return GetButton(7, player);
+                            return getButton(7, player);
                         case OuyaSDK.KeyEnum.BUTTON_DPAD_RIGHT:
-                            return GetButton(8, player);
+                            return getButton(8, player);
                         case OuyaSDK.KeyEnum.BUTTON_LT:
                             return GetAxis(keyCode, player) > -1f;
                         case OuyaSDK.KeyEnum.BUTTON_RT:
@@ -946,21 +1011,21 @@ public class OuyaExampleCommon
                     switch (keyCode)
                     {
                         case OuyaSDK.KeyEnum.BUTTON_LB:
-                            return GetButton(4, player);
+                            return getButton(4, player);
                         case OuyaSDK.KeyEnum.BUTTON_RB:
-                            return GetButton(5, player);
+                            return getButton(5, player);
                         case OuyaSDK.KeyEnum.BUTTON_O:
-                            return GetButton(0, player);
+                            return getButton(0, player);
                         case OuyaSDK.KeyEnum.BUTTON_U:
-                            return GetButton(2, player);
+                            return getButton(2, player);
                         case OuyaSDK.KeyEnum.BUTTON_Y:
-                            return GetButton(3, player);
+                            return getButton(3, player);
                         case OuyaSDK.KeyEnum.BUTTON_A:
-                            return GetButton(1, player);
+                            return getButton(1, player);
                         case OuyaSDK.KeyEnum.BUTTON_L3:
-                            return GetButton(8, player);
+                            return getButton(8, player);
                         case OuyaSDK.KeyEnum.BUTTON_R3:
-                            return GetButton(9, player);
+                            return getButton(9, player);
                         case OuyaSDK.KeyEnum.BUTTON_DPAD_UP:
                             return GetAxis(keyCode, player) > 0f;
                         case OuyaSDK.KeyEnum.BUTTON_DPAD_DOWN:
@@ -986,21 +1051,21 @@ public class OuyaExampleCommon
                 switch (keyCode)
                 {
                     case OuyaSDK.KeyEnum.BUTTON_LB:
-                        return GetButton(6, player);
+                        return getButton(6, player);
                     case OuyaSDK.KeyEnum.BUTTON_RB:
-                        return GetButton(7, player);
+                        return getButton(7, player);
                     case OuyaSDK.KeyEnum.BUTTON_O:
-                        return GetButton(0, player);
+                        return getButton(0, player);
                     case OuyaSDK.KeyEnum.BUTTON_U:
-                        return GetButton(3, player);
+                        return getButton(3, player);
                     case OuyaSDK.KeyEnum.BUTTON_Y:
-                        return GetButton(4, player);
+                        return getButton(4, player);
                     case OuyaSDK.KeyEnum.BUTTON_A:
-                        return GetButton(1, player);
+                        return getButton(1, player);
                     case OuyaSDK.KeyEnum.BUTTON_L3:
-                        return GetButton(13, player);
+                        return getButton(13, player);
                     case OuyaSDK.KeyEnum.BUTTON_R3:
-                        return GetButton(14, player);
+                        return getButton(14, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_UP:
                         return GetAxis(keyCode, player) > 0f;
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_DOWN:
@@ -1020,39 +1085,39 @@ public class OuyaExampleCommon
                 switch (keyCode)
                 {
                     case OuyaSDK.KeyEnum.BUTTON_LB:
-                        return GetButton(13, player);
+                        return getButton(13, player);
                     case OuyaSDK.KeyEnum.BUTTON_RB:
-                        return GetButton(14, player);
+                        return getButton(14, player);
                     case OuyaSDK.KeyEnum.BUTTON_O:
-                        return GetButton(16, player);
+                        return getButton(16, player);
                     case OuyaSDK.KeyEnum.BUTTON_U:
-                        return GetButton(18, player);
+                        return getButton(18, player);
                     case OuyaSDK.KeyEnum.BUTTON_Y:
-                        return GetButton(19, player);
+                        return getButton(19, player);
                     case OuyaSDK.KeyEnum.BUTTON_A:
-                        return GetButton(17, player);
+                        return getButton(17, player);
                     case OuyaSDK.KeyEnum.BUTTON_L3:
-                        return GetButton(11, player);
+                        return getButton(11, player);
                     case OuyaSDK.KeyEnum.BUTTON_R3:
-                        return GetButton(12, player);
+                        return getButton(12, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_UP:
-                        return GetButton(5, player);
+                        return getButton(5, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_DOWN:
-                        return GetButton(6, player);
+                        return getButton(6, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_LEFT:
-                        return GetButton(7, player);
+                        return getButton(7, player);
                     case OuyaSDK.KeyEnum.BUTTON_DPAD_RIGHT:
-                        return GetButton(8, player);
+                        return getButton(8, player);
                     case OuyaSDK.KeyEnum.BUTTON_LT:
                         return GetAxis(keyCode, player) > 0f;
                     case OuyaSDK.KeyEnum.BUTTON_RT:
                         return GetAxis(keyCode, player) > 0f;
                     case OuyaSDK.KeyEnum.BUTTON_SELECT:
-                        return GetButton(10, player);
+                        return getButton(10, player);
                     case OuyaSDK.KeyEnum.BUTTON_START:
-                        return GetButton(9, player);
+                        return getButton(9, player);
                     case OuyaSDK.KeyEnum.BUTTON_SYSTEM:
-                        return GetButton(15, player);
+                        return getButton(15, player);
                     default:
                         return false;
                 }
